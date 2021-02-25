@@ -1,0 +1,1 @@
+{"took":1,"errors":true,"items":[{"update":{"_index":"author_v1","_type":"author","_id":"82255260","status":404,"error":{"type":"document_missing_exception","reason":"[author][82255260]: document missing","index_uuid":"gkocHd2ETLOxwEyh4MxsWw","shard":"5","index":"author_v1"}}}]}

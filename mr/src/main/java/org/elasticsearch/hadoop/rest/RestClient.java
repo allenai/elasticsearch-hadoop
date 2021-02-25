@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import static org.elasticsearch.hadoop.rest.Request.Method.DELETE;
 import static org.elasticsearch.hadoop.rest.Request.Method.GET;
@@ -72,6 +73,7 @@ public class RestClient implements Closeable, StatsAware {
     private final ObjectMapper mapper;
     private final TimeValue scrollKeepAlive;
     private final boolean indexReadMissingAsEmpty;
+    private final Set<Integer> ignorableStatuses;
     private final HttpRetryPolicy retryPolicy;
     final EsMajorVersion internalVersion;
 
@@ -102,6 +104,8 @@ public class RestClient implements Closeable, StatsAware {
         else if (ConfigurationOptions.ES_BATCH_WRITE_RETRY_POLICY_NONE.equals(retryPolicyName)) {
             retryPolicyName = NoHttpRetryPolicy.class.getName();
         }
+
+        ignorableStatuses = settings.getBatchWriteStatusIgnore();
 
         retryPolicy = ObjectUtils.instantiate(retryPolicyName, settings);
         // Assume that the elasticsearch major version is the latest if the version is not already present in the settings
@@ -233,7 +237,7 @@ public class RestClient implements Closeable, StatsAware {
                 Integer status = (Integer) values.get("status");
 
                 String error = extractError(values);
-                if (error != null && !error.isEmpty()) {
+                if (error != null && !ignorableStatuses.contains(status) && !error.isEmpty()) {
                     if ((status != null && HttpStatus.canRetry(status)) || error.contains("EsRejectedExecutionException")) {
                         entryToDeletePosition++;
                         if (errorMessagesSoFar < MAX_BULK_ERROR_MESSAGES) {

@@ -20,10 +20,12 @@ package org.elasticsearch.hadoop.cfg;
 
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.hadoop.util.EsMajorVersion;
@@ -134,6 +136,18 @@ public abstract class Settings {
 
     public boolean getBatchFlushManual() {
         return Booleans.parseBoolean(getProperty(ES_BATCH_FLUSH_MANUAL, ES_BATCH_FLUSH_MANUAL_DEFAULT));
+    }
+
+    public Set<Integer> getBatchWriteStatusIgnore() {
+        String config = getProperty(ES_BATCH_WRITE_STATUS_IGNORE, "");
+        Set<Integer> statuses = new HashSet<Integer>();
+        for (String status : config.split(",")) {
+            String trimmed = status.trim();
+            if (!trimmed.isEmpty()) {
+                statuses.add(Integer.parseInt(status));
+            }
+        }
+        return statuses;
     }
 
     public long getScrollKeepAlive() {

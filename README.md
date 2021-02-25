@@ -1,3 +1,63 @@
+# S2 customizations #
+
+Added `ConfigurationOptions.ES_BATCH_WRITE_STATUS_IGNORE = "es.batch.write.status.ignore"`
+
+Set to a comma-separated list of status codes for bulk writes to ignore, e.g. `"404"`.
+
+This was added so that elasticsearch-spark jobs could `EsSpark.saveToEs` updates (including
+partial updates) without aborting the entire job if a target document no longer existed.
+
+Note 5.5.0 is fairly old. So these changes are probably not super useful except to S2's
+unique (and dated) dependency needs.
+
+To see the changes between the original 5.5.0 release and this fork
+https://github.com/elastic/elasticsearch-hadoop/compare/v5.5.0...allenai:v5.5.0-ai2
+
+## Quick dev instructions ##
+
+This project may import into idea without trouble through gradle integration.
+
+To run unit tests.
+
+    ./gradlew test
+
+There are integration tests, but they have unknown environment requirements (meant to be run
+by their build server) and will not run locally. On a modern version of this library this
+may be worth pursuing, but not this version. Do not rely on them and instead rely on integration
+tests in the applications dependent on this fork.
+
+To build the elasticsearch-spark dependency for Scala 2.11 and install it to your local repo.
+
+    ./gradlew -P scala=211 'elasticsearch-spark-20:install'
+
+Only scala 2.10 and 2.11 are supported. To build for other Scala major versions, 
+you will have to modify the gradle build config. It is completely unknown if there will
+be other incompatibilities.
+
+Once you have the files generated locally, you will have to manually publish them to whatever 
+dependency repository we are currently using. At the time of this writing that
+was in flux, but it was [this bintray repo](https://bintray.com/allenai/private/elasticsearch-spark-ai2/5.5.0-ai2-SNAPSHOT).
+Whatever our repository, the directory structure should mirror how it your local maven repo.
+
+The files are installed locally in a path like this.
+
+    $ tree ~/.m2/repository/org/elasticsearch/elasticsearch-spark-20_2.11/5.5.0-ai2-SNAPSHOT/
+    /Users/jasond/.m2/repository/org/elasticsearch/elasticsearch-spark-20_2.11/5.5.0-ai2-SNAPSHOT/
+    ├── elasticsearch-spark-20_2.11-5.5.0-ai2-SNAPSHOT-javadoc.jar
+    ├── elasticsearch-spark-20_2.11-5.5.0-ai2-SNAPSHOT-sources.jar
+    ├── elasticsearch-spark-20_2.11-5.5.0-ai2-SNAPSHOT.jar
+    ├── elasticsearch-spark-20_2.11-5.5.0-ai2-SNAPSHOT.pom
+    └── maven-metadata-local.xml
+
+If you rely on the snapshot semantics illustrated above it is a good idea to declare the dependency
+as changing in your config so that updated snapshots get pulled down. In sbt it's something like this.
+
+    libraryDependencies += "org.elasticsearch" % "elasticsearch-spark-20_2.11" % "5.5.0-ai2-SNAPSHOT" changing()
+
+
+----
+
+
 # Elasticsearch Hadoop [![Build Status](https://travis-ci.org/elastic/elasticsearch-hadoop.svg?branch=master)](https://travis-ci.org/elastic/elasticsearch-hadoop)
 Elasticsearch real-time search and analytics natively integrated with Hadoop.  
 Supports [Map/Reduce](#mapreduce), [Cascading](#cascading), [Apache Hive](#apache-hive), [Apache Pig](#apache-pig), [Apache Spark](#apache-spark) and [Apache Storm](#apache-storm).
