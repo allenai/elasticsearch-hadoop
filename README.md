@@ -37,7 +37,7 @@ be other incompatibilities.
 Once you have the files generated locally, you will have to manually publish them to whatever 
 dependency repository we are currently using. At the time of this writing that
 was in flux, but it was [this bintray repo](https://bintray.com/allenai/private/elasticsearch-spark-ai2/5.5.0-ai2-SNAPSHOT).
-Whatever our repository, the directory structure should mirror how it your local maven repo.
+Whatever our repository, the directory structure should mirror your local maven repo.
 
 The files are installed locally in a path like this.
 
