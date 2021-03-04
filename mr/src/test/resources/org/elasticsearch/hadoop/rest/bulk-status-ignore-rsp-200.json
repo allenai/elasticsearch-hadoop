@@ -1,0 +1,1 @@
+{"took":4,"errors":false,"items":[{"update":{"_index":"author_v1","_type":"author","_id":"38092776","_version":128,"result":"updated","_shards":{"total":1,"successful":1,"failed":0},"status":200}}]}
